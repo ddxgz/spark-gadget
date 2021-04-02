@@ -3,7 +3,7 @@ package datautils
 // import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.{Dataset, DataFrame}
 
-abstract class DataSource(sourceType: String, defaultFormat: String)
+abstract class DataSource(val sourceType: String)
 
 trait RootPather {
   def rootPath(): String
@@ -17,11 +17,18 @@ trait DfSaver {
   def save(): DataFrame
 }
 
+abstract class DatabaseDataSource(
+    override val sourceType: String
+) extends DataSource(sourceType) {
+
+  override def toString(): String = s"[$sourceType]"
+}
+
 abstract class FileDataSource(
-    val sourceType: String,
-    val pathPrefix: Option[String] = None,
-    val defaultFormat: String
-) extends DataSource(sourceType, defaultFormat)
+    override val sourceType: String,
+    val pathPrefix: Option[String] = None
+    // val defaultFormat: String
+) extends DataSource(sourceType)
     with RootPather {
 
   def file(path: String): String = { rootPath.stripSuffix("/") + s"/$path" }
@@ -30,15 +37,15 @@ abstract class FileDataSource(
 }
 
 case class DataSourceAzBlob(
-    val sourceType: String = "Azure Blob",
+    override val sourceType: String = "Azure Blob",
     val blob: String,
     val container: String,
-    val pathPrefix: Option[String] = None,
+    override val pathPrefix: Option[String] = None,
     val secretScope: String,
     val secretKey: String,
-    val defaultFormat: String = "parquet",
+    var defaultFormat: String = "parquet",
     val mountNow: Boolean = true
-) extends FileDataSource(sourceType, pathPrefix, defaultFormat)
+) extends FileDataSource(sourceType, pathPrefix)
     with RootPather {
 
   val mountSource =
@@ -51,4 +58,24 @@ case class DataSourceAzBlob(
     case None         => s"dbfs://$mountPath"
   }
 
+}
+
+case class DataSourceJdbc(
+    override val sourceType: String = "JDBC",
+    val jdbcUrl: String,
+    val tempDir: String
+) extends DatabaseDataSource(sourceType) {
+
+  val defaultReadOptions = Map[String, String](
+    "url" -> jdbcUrl,
+    "tempDir" -> tempDir,
+    "forwardSparkAzureStorageCredentials" -> "true"
+  )
+
+  val formatSqldw = "com.databricks.spark.sqldw"
+
+  val rwTypes = Array[String](
+    "dbTable",
+    "query"
+  )
 }
