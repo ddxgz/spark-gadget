@@ -1,8 +1,7 @@
-package cake
+package datautils
 
-import org.apache.spark.sql.SparkSession
+// import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.{Dataset, DataFrame}
-// import com.databricks.dbutils_v1.DBUtilsHolder.dbutils
 
 abstract class DataSource(sourceType: String, defaultFormat: String)
 
@@ -17,24 +16,29 @@ trait DfLoader {
 trait DfSaver {
   def save(): DataFrame
 }
-// trait DataSourceBlob {
-//   def rootPath: String
-// }
 
-abstract class FileDataSource(sourceType: String, defaultFormat: String)
-    extends DataSource(sourceType, defaultFormat)
+abstract class FileDataSource(
+    val sourceType: String,
+    val pathPrefix: Option[String] = None,
+    val defaultFormat: String
+) extends DataSource(sourceType, defaultFormat)
     with RootPather {
+
   def file(path: String): String = { rootPath.stripSuffix("/") + s"/$path" }
+
+  override def toString(): String = s"[$sourceType] $rootPath"
 }
 
-case class DataSourceBlob(
-    blob: String,
-    container: String,
-    pathPrefix: Option[String] = None,
-    secretScope: String,
-    secretKey: String,
-    mountNow: Boolean = true
-) extends FileDataSource(sourceType, defaultFormat)
+case class DataSourceAzBlob(
+    val sourceType: String = "Azure Blob",
+    val blob: String,
+    val container: String,
+    val pathPrefix: Option[String] = None,
+    val secretScope: String,
+    val secretKey: String,
+    val defaultFormat: String = "parquet",
+    val mountNow: Boolean = true
+) extends FileDataSource(sourceType, pathPrefix, defaultFormat)
     with RootPather {
 
   val mountSource =
@@ -46,7 +50,5 @@ case class DataSourceBlob(
     case Some(prefix) => s"dbfs://$mountPath/$prefix"
     case None         => s"dbfs://$mountPath"
   }
-
-  override def toString(): String = rootPath
 
 }
