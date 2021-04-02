@@ -3,7 +3,6 @@
 // version := "1.0"
 
 ThisBuild / scalaVersion := "2.12.12"
-// ThisBuild / organization := "se.reinsight"
 
 // val scalaTest = "org.scalatest" %% "scalatest" % "3.0.5"
 
