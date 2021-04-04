@@ -12,6 +12,8 @@ object commonTransforms {
         .alias(namePairs.getOrElse(oldName, oldName))
     }: _*)
 
+  /** Rename Columns by referring to tuples, tuple._1 to tuple._2
+    */
   def renameColumns(
       namePairs: Array[(String, String)]
   )(df: DataFrame): DataFrame = df
@@ -20,6 +22,8 @@ object commonTransforms {
         .alias(newName)
     }: _*)
 
+  /** Replace nulls in a Seq of columns to the specified value.
+    */
   def replaceNulls(cols: Seq[String], as: Any, prefixFilled: String = "")(
       df: DataFrame
   ): DataFrame = {
@@ -61,6 +65,10 @@ object commonTransforms {
     replaceNulls(cols, "N/A", prefixFilled)(df)
   }
 
+  /** Add a column by using monotonically_increasing_id().
+    *
+    * Perform coalesce(1) (default True) if the dataset is small.
+    */
   def addMonotonicId(colName: String, performCoalesce: Boolean = true)(
       df: DataFrame
   ): DataFrame = {
@@ -68,6 +76,9 @@ object commonTransforms {
     df_.withColumn(colName, F.monotonically_increasing_id() + 1)
   }
 
+  /** Add Date ID column from a Seq of timestamp columns as Integer. The default
+    * format is `yyyyMMdd`.
+    */
   def timestampToID(cols: Seq[String], format: String = "yyyyMMdd")(
       df: DataFrame
   ): DataFrame = {
@@ -82,10 +93,15 @@ object commonTransforms {
     }
   }
 
+  /** Change timezone of a Seq of timestamp columns from UTC to Oslo.
+    */
   def utcToOslo(cols: Seq[String])(df: DataFrame): DataFrame = {
     df.transform(utcToTimezone("Europe/Oslo", cols))
   }
 
+  /** Change timezone of a Seq of timestamp columns from UTC to the specified
+    *  timezone by `tzStr` in format like "Europe/Oslo".
+    */
   def utcToTimezone(tzStr: String, cols: Seq[String])(
       df: DataFrame
   ): DataFrame = {
