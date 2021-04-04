@@ -1,6 +1,6 @@
-// name := "NibeProto"
+name := "SparkGadget"
 
-// version := "1.0"
+version := "0.1.0"
 
 ThisBuild / scalaVersion := "2.12.12"
 
@@ -11,8 +11,8 @@ lazy val etl = (project in file("etl"))
     name := "ETL",
     libraryDependencies ++= Seq(
       //   "org.apache.spark" %% "spark-core" % "3.0.1" % "provided",
-      "org.apache.spark" %% "spark-sql" % "3.1.1" % "provided"
-      //   "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+      "org.apache.spark" %% "spark-sql" % "3.1.1", //% "provided",
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
     )
   )
 
@@ -21,6 +21,7 @@ lazy val datautils = (project in file("datautils"))
     name := "DataUtils",
     libraryDependencies ++= Seq(
       //   "org.apache.spark" %% "spark-core" % "3.0.1" % "provided",
-      "org.apache.spark" %% "spark-sql" % "3.1.1" % "provided"
+      "org.apache.spark" %% "spark-sql" % "3.1.1" % "provided",
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
     )
   )

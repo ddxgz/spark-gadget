@@ -2,7 +2,7 @@ package etl
 
 import org.apache.spark.sql.{Dataset, DataFrame, Column, functions => F}
 
-object commonTransforms {
+object CommonTransforms {
 
   def renameColumns(
       namePairs: Map[String, String]
@@ -15,7 +15,7 @@ object commonTransforms {
   /** Rename Columns by referring to tuples, tuple._1 to tuple._2
     */
   def renameColumns(
-      namePairs: Array[(String, String)]
+      namePairs: Seq[(String, String)]
   )(df: DataFrame): DataFrame = df
     .select(namePairs.map { case (oldName, newName) =>
       F.col(oldName)
