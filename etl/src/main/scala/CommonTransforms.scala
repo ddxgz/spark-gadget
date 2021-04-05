@@ -5,6 +5,14 @@ import org.apache.spark.sql.{Dataset, DataFrame, Column, functions => F}
 /** A handler for accessing various of Spark DataFrame handy transformations. */
 object CommonTransforms {
 
+  /** Rename columns by passing a map.
+    *
+    * The order is not guarantted due to the nature of map.
+    *
+    * @param namePairs
+    * @param df
+    * @return
+    */
   def renameColumns(
       namePairs: Map[String, String]
   )(df: DataFrame): DataFrame = df
@@ -17,7 +25,7 @@ object CommonTransforms {
   def renameColumns(
       namePairs: (String, String)*
   )(df: DataFrame): DataFrame = df
-    .select(namePairs.toVector.map { case (oldName, newName) =>
+    .select(namePairs.map { case (oldName, newName) =>
       F.col(oldName)
         .alias(newName)
     }: _*)
@@ -26,7 +34,7 @@ object CommonTransforms {
   def replaceNulls(cols: Seq[String], as: Any, prefixFilled: String = "")(
       df: DataFrame
   ): DataFrame = {
-    cols.toVector.foldLeft(df)((df, c) =>
+    cols.foldLeft(df)((df, c) =>
       df.withColumn(
         s"$prefixFilled$c",
         F.when(F.col(c).isNull, as).otherwise(F.col(c))
@@ -105,7 +113,7 @@ object CommonTransforms {
   def utcToTimezone(tzStr: String, cols: Seq[String])(
       df: DataFrame
   ): DataFrame = {
-    cols.toVector.foldLeft(df) { (tdf, col) =>
+    cols.foldLeft(df) { (tdf, col) =>
       tdf.withColumn(col, F.from_utc_timestamp(F.col(col), tzStr))
     }
   }
