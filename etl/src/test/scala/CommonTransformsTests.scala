@@ -23,14 +23,10 @@ class CommonTransformsTest extends FunSpec {
         ("col2", "newcol2")
       )
 
-      assert(
-        df.transform(CommonTransforms.renameColumns(newNames))
-          .columns(0) == "newcol1"
-      )
-      assert(
-        df.transform(CommonTransforms.renameColumns(newNames))
-          .columns(1) == "newcol2"
-      )
+      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames))
+
+      assert(dfRenamed.columns(0) == "newcol1")
+      assert(dfRenamed.columns(1) == "newcol2")
     }
 
     it("should reorder the columns") {
@@ -40,13 +36,25 @@ class CommonTransformsTest extends FunSpec {
         ("col1", "newcol1")
       )
 
+      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames))
+
+      assert(dfRenamed.columns(0) == "newcol2")
+      assert(dfRenamed.columns(1) == "newcol1")
+    }
+
+  }
+  describe("CommonTransforms::utcToOslo") {
+
+    val df = Seq(
+      (1, "2020-01-01T23:00:00"),
+      (2, "2020-01-01T13:00:00")
+    ).toDF("id", "ts_str")
+      .withColumn("ts1", F.to_timestamp($"ts_str"))
+
+    it("should changed timezone") {
+      val df2 = df.transform(CommonTransforms.utcToOslo(Seq("ts1")))
       assert(
-        df.transform(CommonTransforms.renameColumns(newNames))
-          .columns(0) == "newcol2"
-      )
-      assert(
-        df.transform(CommonTransforms.renameColumns(newNames))
-          .columns(1) == "newcol1"
+        df2.withColumn("str_oslo", F.date_format($"ts1", "yyyy-MM-dd")) == df
       )
     }
   }

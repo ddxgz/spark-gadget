@@ -57,9 +57,14 @@ case class DataSourceAzBlob(
     case Some(prefix) => s"dbfs://$mountPath/$prefix"
     case None         => s"dbfs://$mountPath"
   }
-
 }
 
+/** A DataSource for the source type of `JDBC`.
+  *
+  *  @constructor create a new DataSourceJdbc with JDBC URL and temp dir.
+  *  @param jdbcUrl the database's JDBC URL
+  *  @param tempDir the temporary directory in a blob storage
+  */
 case class DataSourceJdbc(
     override val sourceType: String = "JDBC",
     val jdbcUrl: String,
@@ -74,7 +79,7 @@ case class DataSourceJdbc(
 
   val formatSqldw = "com.databricks.spark.sqldw"
 
-  val rwTypes = Array[String](
+  val rwTypes = Vector[String](
     "dbTable",
     "query"
   )
