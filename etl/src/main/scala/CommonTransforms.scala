@@ -8,16 +8,16 @@ object CommonTransforms {
   def renameColumns(
       namePairs: Map[String, String]
   )(df: DataFrame): DataFrame = df
-    .select(namePairs.keys.toSeq.map { oldName =>
+    .select(namePairs.keys.toVector.map { oldName =>
       F.col(oldName)
         .alias(namePairs.getOrElse(oldName, oldName))
     }: _*)
 
-  /** Rename Columns by referring to tuples, tuple._1 to tuple._2 */
+  /** Rename Columns by referring to tuples, from tuple._1 to tuple._2 */
   def renameColumns(
-      namePairs: Seq[(String, String)]
+      namePairs: (String, String)*
   )(df: DataFrame): DataFrame = df
-    .select(namePairs.map { case (oldName, newName) =>
+    .select(namePairs.toVector.map { case (oldName, newName) =>
       F.col(oldName)
         .alias(newName)
     }: _*)
@@ -26,7 +26,7 @@ object CommonTransforms {
   def replaceNulls(cols: Seq[String], as: Any, prefixFilled: String = "")(
       df: DataFrame
   ): DataFrame = {
-    cols.foldLeft(df)((df, c) =>
+    cols.toVector.foldLeft(df)((df, c) =>
       df.withColumn(
         s"$prefixFilled$c",
         F.when(F.col(c).isNull, as).otherwise(F.col(c))
@@ -34,34 +34,34 @@ object CommonTransforms {
     )
   }
 
-  def nullToZero(cols: Seq[String], prefixFilled: String = "")(
+  def nullToZero(cols: String*)(
       df: DataFrame
   ): DataFrame = {
-    replaceNulls(cols, 0, prefixFilled)(df)
+    replaceNulls(cols, 0, "")(df)
   }
 
-  def nullToMinus1(cols: Seq[String], prefixFilled: String = "")(
+  def nullToMinus1(cols: String*)(
       df: DataFrame
   ): DataFrame = {
-    replaceNulls(cols, -1, prefixFilled)(df)
+    replaceNulls(cols, -1, "")(df)
   }
 
-  def nullToND(cols: Seq[String], prefixFilled: String = "")(
+  def nullToND(cols: String*)(
       df: DataFrame
   ): DataFrame = {
-    replaceNulls(cols, "N/D", prefixFilled)(df)
+    replaceNulls(cols, "N/D", "")(df)
   }
 
-  def nullToMinus2(cols: Seq[String], prefixFilled: String = "")(
+  def nullToMinus2(cols: String*)(
       df: DataFrame
   ): DataFrame = {
-    replaceNulls(cols, -2, prefixFilled)(df)
+    replaceNulls(cols, -2, "")(df)
   }
 
-  def nullToNA(cols: Seq[String], prefixFilled: String = "")(
+  def nullToNA(cols: String*)(
       df: DataFrame
   ): DataFrame = {
-    replaceNulls(cols, "N/A", prefixFilled)(df)
+    replaceNulls(cols, "N/A", "")(df)
   }
 
   /** Add a column by using monotonically_increasing_id().
@@ -94,7 +94,8 @@ object CommonTransforms {
 
   /** Change timezone of a Seq of timestamp columns from UTC to Oslo.
     */
-  def utcToOslo(cols: Seq[String])(df: DataFrame): DataFrame = {
+  def utcToOslo(cols: String*)(df: DataFrame): DataFrame = {
+    // def utcToOslo(cols: Seq[String])(df: DataFrame): DataFrame = {
     df.transform(utcToTimezone("Europe/Oslo", cols))
   }
 
@@ -104,7 +105,7 @@ object CommonTransforms {
   def utcToTimezone(tzStr: String, cols: Seq[String])(
       df: DataFrame
   ): DataFrame = {
-    cols.foldLeft(df) { (tdf, col) =>
+    cols.toVector.foldLeft(df) { (tdf, col) =>
       tdf.withColumn(col, F.from_utc_timestamp(F.col(col), tzStr))
     }
   }

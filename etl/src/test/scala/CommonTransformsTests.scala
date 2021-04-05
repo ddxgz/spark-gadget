@@ -39,7 +39,7 @@ class CommonTransformsTest
         ("col2", "newcol2")
       )
 
-      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames))
+      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames: _*))
 
       assert(dfRenamed.columns(0) == "newcol1")
       assert(dfRenamed.columns(1) == "newcol2")
@@ -52,7 +52,7 @@ class CommonTransformsTest
         ("col1", "newcol1")
       )
 
-      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames))
+      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames: _*))
 
       assert(dfRenamed.columns(0) == "newcol2")
       assert(dfRenamed.columns(1) == "newcol1")
@@ -66,6 +66,7 @@ class CommonTransformsTest
       (2, "2020-01-01T13:00:00")
     ).toDF("id", "ts_str")
       .withColumn("ts1", F.to_timestamp($"ts_str"))
+      .withColumn("ts2", F.to_timestamp($"ts_str"))
 
     it("should changed timezone") {
       val dfExpected = Seq(
@@ -74,9 +75,24 @@ class CommonTransformsTest
       ).toDF("id", "ts_str")
 
       val dfActual = df
-        .transform(CommonTransforms.utcToOslo(Seq("ts1")))
+        .transform(CommonTransforms.utcToOslo("ts1"))
         .withColumn("ts_str", F.date_format($"ts1", "yyyy-MM-dd"))
         .select("id", "ts_str")
+
+      assertSmallDatasetEquality(dfActual, dfExpected)
+    }
+
+    it("should changed timezone for multiple cols") {
+      val dfExpected = Seq(
+        (1, "2020-01-02", "2020-01-02"),
+        (2, "2020-01-01", "2020-01-01")
+      ).toDF("id", "ts_str1", "ts_str2")
+
+      val dfActual = df
+        .transform(CommonTransforms.utcToOslo("ts1", "ts2"))
+        .withColumn("ts_str1", F.date_format($"ts1", "yyyy-MM-dd"))
+        .withColumn("ts_str2", F.date_format($"ts2", "yyyy-MM-dd"))
+        .select("id", "ts_str1", "ts_str2")
 
       assertSmallDatasetEquality(dfActual, dfExpected)
     }
