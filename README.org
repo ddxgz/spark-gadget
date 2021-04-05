@@ -1,1 +1,8 @@
 * Spark-Gadget
+
+** dataUtils 
+=dataUtils= holds some Classes that represent a connection different types of data sources. They are to be used reduce some effort on concatenating strings.
+
+
+** etl
+=etl= to provide some frequently used operations (currently only CommonTransforms for DataFrame) that is not directly available in Spark.
