@@ -12,7 +12,8 @@ lazy val etl = (project in file("etl"))
     libraryDependencies ++= Seq(
       //   "org.apache.spark" %% "spark-core" % "3.0.1" % "provided",
       "org.apache.spark" %% "spark-sql" % "3.1.1", //% "provided",
-      "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+      "org.scalatest" %% "scalatest" % "3.0.5" % "test",
+      "com.github.mrpowers" %% "spark-fast-tests" % "1.0.0" % "test"
     )
   )
 

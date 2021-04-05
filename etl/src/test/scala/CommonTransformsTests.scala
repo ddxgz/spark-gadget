@@ -3,9 +3,25 @@ package etl
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.{Dataset, DataFrame, Row, Column, functions => F}
 import org.scalatest.FunSpec
+import com.github.mrpowers.spark.fast.tests.DatasetComparer
 
-class CommonTransformsTest extends FunSpec {
-  val spark = SparkSession.builder().master("local").getOrCreate()
+trait SparkSessionTestWrapper {
+
+  lazy val spark: SparkSession = {
+    SparkSession
+      .builder()
+      .master("local")
+      .appName("CommonTransformsTest")
+      .config("spark.sql.shuffle.partitions", "1")
+      .getOrCreate()
+  }
+
+}
+
+class CommonTransformsTest
+    extends FunSpec
+    with SparkSessionTestWrapper
+    with DatasetComparer {
 
   import spark.implicits._
 
@@ -41,8 +57,8 @@ class CommonTransformsTest extends FunSpec {
       assert(dfRenamed.columns(0) == "newcol2")
       assert(dfRenamed.columns(1) == "newcol1")
     }
-
   }
+
   describe("CommonTransforms::utcToOslo") {
 
     val df = Seq(
@@ -52,10 +68,17 @@ class CommonTransformsTest extends FunSpec {
       .withColumn("ts1", F.to_timestamp($"ts_str"))
 
     it("should changed timezone") {
-      val df2 = df.transform(CommonTransforms.utcToOslo(Seq("ts1")))
-      assert(
-        df2.withColumn("str_oslo", F.date_format($"ts1", "yyyy-MM-dd")) == df
-      )
+      val dfExpected = Seq(
+        (1, "2020-01-02"),
+        (2, "2020-01-01")
+      ).toDF("id", "ts_str")
+
+      val dfActual = df
+        .transform(CommonTransforms.utcToOslo(Seq("ts1")))
+        .withColumn("ts_str", F.date_format($"ts1", "yyyy-MM-dd"))
+        .select("id", "ts_str")
+
+      assertSmallDatasetEquality(dfActual, dfExpected)
     }
   }
 }
