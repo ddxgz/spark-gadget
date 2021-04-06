@@ -71,7 +71,6 @@ class DataUtils(secretScope: String, spark: SparkSession) {
     DataSourceJdbc(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
   }
 
-  // A wrap to get blob name by using key vault
   def getDataSourceBlobBySecret(
       blobNameSecretKey: String,
       container: String,
@@ -122,10 +121,7 @@ object DataUtils {
     return du
   }
 
-// def DataSourceJdbc()
 
-  //sql-dw-001-pw
-// jdbc:sqlserver://group-bi-dev-we-sql-001.database.windows.net:1433;database=group-bi-dev-we-sqldw-001;user=SPAdminSQLDW001@group-bi-dev-we-sql-001;password=sof2342343##HHaskjkjw;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
   def getJdbcUrl(
       name: String,
       port: Int,
@@ -138,7 +134,6 @@ object DataUtils {
     val dw = name
     val jdbcPort = port
     val hostname = s"$dw.database.windows.net"
-    // val database = "group-bi-dev-we-sqldw-001"
     val user =
       dbutils.secrets.get(scope = secretScope, key = userKey)
     val pw =
