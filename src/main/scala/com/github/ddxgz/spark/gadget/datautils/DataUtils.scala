@@ -1,4 +1,4 @@
-package datautils
+package com.github.ddxgz.spark.gadget.datautils
 
 import org.apache.spark.sql.SparkSession
 import com.databricks.dbutils_v1.DBUtilsHolder.dbutils

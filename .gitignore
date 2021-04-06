@@ -4,7 +4,8 @@
 .metals/
 bin/
 target/
-project/
+# project/
+project/metals.sbt
 build/
 .cache
 .cache-main
