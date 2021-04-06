@@ -10,11 +10,15 @@ trait RootPather {
 }
 
 trait DfLoader {
-  def load(): DataFrame
+  def load(tableName: String): DataFrame
 }
 
 trait DfSaver {
-  def save(): DataFrame
+  def save(
+      df: DataFrame,
+      tableName: String,
+      saveMode: String
+  ): Unit
 }
 
 abstract class DatabaseDataSource(
@@ -90,7 +94,9 @@ case class DataSourceJdbc(
     val jdbcUrl: String,
     val tempDir: String,
     val spark: SparkSession
-) extends DatabaseDataSource(sourceType) {
+) extends DatabaseDataSource(sourceType)
+    with DfLoader
+    with DfSaver {
 
   val defaultReadOptions = Map[String, String](
     "url" -> jdbcUrl,
@@ -104,4 +110,30 @@ case class DataSourceJdbc(
     "dbTable",
     "query"
   )
+
+  def read(tableOrExpr: String, rwType: String): DataFrame = {
+    assert(rwTypes.contains(rwType))
+    val options = defaultReadOptions + (rwType -> tableOrExpr)
+    spark.read
+      .format(formatSqldw)
+      .options(options)
+      .load()
+  }
+
+  def load(tableName: String): DataFrame = read(tableName, "dbTable")
+
+  def query(expr: String): DataFrame = read(expr, "query")
+
+  def save(
+      df: DataFrame,
+      tableName: String,
+      saveMode: String
+  ): Unit = {
+    val options = defaultReadOptions + ("dbTable" -> tableName)
+    df.write
+      .format(formatSqldw)
+      .options(options)
+      .mode(saveMode)
+      .save()
+  }
 }
