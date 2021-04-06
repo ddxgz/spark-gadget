@@ -23,6 +23,7 @@ lazy val datautils = (project in file("datautils"))
     libraryDependencies ++= Seq(
       //   "org.apache.spark" %% "spark-core" % "3.0.1" % "provided",
       "org.apache.spark" %% "spark-sql" % "3.1.1" % "provided",
+      "com.databricks" % "dbutils-api_2.11" % "0.0.4",
       "org.scalatest" %% "scalatest" % "3.0.5" % "test"
     )
   )

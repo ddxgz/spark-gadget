@@ -1,6 +1,6 @@
 package datautils
 
-// import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.{Dataset, DataFrame}
 
 abstract class DataSource(val sourceType: String)
@@ -59,6 +59,26 @@ case class DataSourceAzBlob(
   }
 }
 
+case class DataSourceAdls2(
+    override val sourceType: String = "ADLS Gen2",
+    blob: String,
+    container: String,
+    override val pathPrefix: Option[String] = None,
+    secretScope: String,
+    secretKey: String
+) extends FileDataSource(sourceType, pathPrefix)
+    with RootPather {
+
+  val abfssRootPath =
+    s"abfss://$container@$blob.dfs.core.windows.net"
+
+  val rootPath = pathPrefix match {
+    case Some(prefix) => s"$abfssRootPath/$prefix"
+    case None         => s"$abfssRootPath"
+  }
+
+}
+
 /** A DataSource for the source type of `JDBC`.
   *
   *  @constructor create a new DataSourceJdbc with JDBC URL and temp dir.
@@ -68,7 +88,8 @@ case class DataSourceAzBlob(
 case class DataSourceJdbc(
     override val sourceType: String = "JDBC",
     val jdbcUrl: String,
-    val tempDir: String
+    val tempDir: String,
+    val spark: SparkSession
 ) extends DatabaseDataSource(sourceType) {
 
   val defaultReadOptions = Map[String, String](
