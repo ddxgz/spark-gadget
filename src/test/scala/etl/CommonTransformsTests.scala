@@ -25,7 +25,9 @@ class CommonTransformsTest
 
   import spark.implicits._
 
-  describe("CommonTransforms::renameColumns") {
+  val ct = commonTransforms
+
+  describe("commonTransforms::renameColumns") {
 
     val df = Seq(
       (1, "a"),
@@ -39,7 +41,7 @@ class CommonTransformsTest
         ("col2", "newcol2")
       )
 
-      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames: _*))
+      val dfRenamed = df.transform(ct.renameColumns(newNames: _*))
 
       assert(dfRenamed.columns(0) == "newcol1")
       assert(dfRenamed.columns(1) == "newcol2")
@@ -52,14 +54,14 @@ class CommonTransformsTest
         ("col1", "newcol1")
       )
 
-      val dfRenamed = df.transform(CommonTransforms.renameColumns(newNames: _*))
+      val dfRenamed = df.transform(ct.renameColumns(newNames: _*))
 
       assert(dfRenamed.columns(0) == "newcol2")
       assert(dfRenamed.columns(1) == "newcol1")
     }
   }
 
-  describe("CommonTransforms::utcToOslo") {
+  describe("ct::utcToOslo") {
 
     val df = Seq(
       (1, "2020-01-01T23:00:00"),
@@ -75,7 +77,7 @@ class CommonTransformsTest
       ).toDF("id", "ts_str")
 
       val dfActual = df
-        .transform(CommonTransforms.utcToOslo("ts1"))
+        .transform(ct.utcToOslo("ts1"))
         .withColumn("ts_str", F.date_format($"ts1", "yyyy-MM-dd"))
         .select("id", "ts_str")
 
@@ -89,7 +91,7 @@ class CommonTransformsTest
       ).toDF("id", "ts_str1", "ts_str2")
 
       val dfActual = df
-        .transform(CommonTransforms.utcToOslo("ts1", "ts2"))
+        .transform(ct.utcToOslo("ts1", "ts2"))
         .withColumn("ts_str1", F.date_format($"ts1", "yyyy-MM-dd"))
         .withColumn("ts_str2", F.date_format($"ts2", "yyyy-MM-dd"))
         .select("id", "ts_str1", "ts_str2")

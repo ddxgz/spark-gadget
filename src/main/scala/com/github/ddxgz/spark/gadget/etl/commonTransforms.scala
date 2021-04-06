@@ -3,7 +3,7 @@ package com.github.ddxgz.spark.gadget.etl
 import org.apache.spark.sql.{Dataset, DataFrame, Column, functions => F}
 
 /** A handler for accessing various of Spark DataFrame handy transformations. */
-object CommonTransforms {
+object commonTransforms {
 
   /** Rename columns by passing a map.
     *
