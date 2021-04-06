@@ -35,11 +35,24 @@ abstract class FileDataSource(
 ) extends DataSource(sourceType)
     with RootPather {
 
-  def file(path: String): String = { rootPath.stripSuffix("/") + s"/$path" }
+  def file(path: String): String = {
+    rootPath.stripSuffix("/") + s"/${path.stripPrefix("/")}"
+  }
 
   override def toString(): String = s"[$sourceType] $rootPath"
 }
 
+/** DataSource to Azure Blob Storage.
+  *
+  * @param sourceType
+  * @param blob
+  * @param container
+  * @param pathPrefix
+  * @param secretScope
+  * @param secretKey
+  * @param defaultFormat
+  * @param mountNow if to mount the blob to Databrocks at `/mnt/\*`
+  */
 case class DataSourceAzBlob(
     override val sourceType: String = "Azure Blob",
     val blob: String,
@@ -63,6 +76,15 @@ case class DataSourceAzBlob(
   }
 }
 
+/** DataSource to Azure Data Lake Storage Gen2
+  *
+  * @param sourceType
+  * @param blob
+  * @param container
+  * @param pathPrefix
+  * @param secretScope
+  * @param secretKey
+  */
 case class DataSourceAdls2(
     override val sourceType: String = "ADLS Gen2",
     blob: String,
@@ -83,14 +105,14 @@ case class DataSourceAdls2(
 
 }
 
-/** A DataSource for the source type of `JDBC`.
+/** A DataSource for the source type of `Azure Synapse via JDBC`.
   *
   *  @constructor create a new DataSourceJdbc with JDBC URL and temp dir.
   *  @param jdbcUrl the database's JDBC URL
   *  @param tempDir the temporary directory in a blob storage
   */
-case class DataSourceJdbc(
-    override val sourceType: String = "JDBC",
+case class DataSourceAzSynapse(
+    override val sourceType: String = "Azure Synapse via JDBC",
     val jdbcUrl: String,
     val tempDir: String,
     val spark: SparkSession
