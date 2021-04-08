@@ -35,9 +35,10 @@ abstract class FileDataSource(
 ) extends DataSource(sourceType)
     with RootPather {
 
-  def file(path: String): String = {
-    rootPath.stripSuffix("/") + s"/${path.stripPrefix("/")}"
-  }
+  def composePath(left: String, right: String): String =
+    left.stripSuffix("/") + s"/${right.stripPrefix("/")}"
+
+  def file(path: String): String = composePath(rootPath(), path)
 
   override def toString(): String = s"[$sourceType] $rootPath"
 }
@@ -71,7 +72,7 @@ case class DataSourceAzBlob(
   val mountPath = s"/mnt/$blob-$container"
 
   val rootPath = pathPrefix match {
-    case Some(prefix) => s"dbfs://$mountPath/$prefix"
+    case Some(prefix) => composePath(s"dbfs://$mountPath", prefix)
     case None         => s"dbfs://$mountPath"
   }
 }
@@ -99,7 +100,7 @@ case class DataSourceAdls2(
     s"abfss://$container@$blob.dfs.core.windows.net"
 
   val rootPath = pathPrefix match {
-    case Some(prefix) => s"$abfssRootPath/$prefix"
+    case Some(prefix) => composePath(abfssRootPath, prefix)
     case None         => s"$abfssRootPath"
   }
 

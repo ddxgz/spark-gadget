@@ -1,4 +1,4 @@
-package com.github.ddxgz.spark.gadget.etl
+package com.github.ddxgz.spark.gadget
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.{Dataset, DataFrame, Row, Column, functions => F}

@@ -1,21 +1,10 @@
 package com.github.ddxgz.spark.gadget.datautils
 
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.StructType
 import com.databricks.dbutils_v1.DBUtilsHolder.dbutils
 
 class DataUtils(secretScope: String, spark: SparkSession) {
-
-  def getDataSourceAdls2BySecret(
-      blobNameSecretKey: String,
-      container: String,
-      pathPrefix: Option[String] = None,
-      secretScope: String = secretScope,
-      secretKey: String
-  ): DataSourceAdls2 = {
-    val blob = dbutils.secrets.get(scope = secretScope, key = blobNameSecretKey)
-
-    getDataSourceAdls2(blob, container, pathPrefix, secretScope, secretKey)
-  }
 
   def getDataSourceAdls2(
       blob: String,
@@ -40,6 +29,18 @@ class DataUtils(secretScope: String, spark: SparkSession) {
       secretScope = secretScope,
       secretKey = secretKey
     )
+  }
+
+  def getDataSourceAdls2BySecret(
+      blobNameSecretKey: String,
+      container: String,
+      pathPrefix: Option[String] = None,
+      secretScope: String = secretScope,
+      secretKey: String
+  ): DataSourceAdls2 = {
+    val blob = dbutils.secrets.get(scope = secretScope, key = blobNameSecretKey)
+
+    getDataSourceAdls2(blob, container, pathPrefix, secretScope, secretKey)
   }
 
   def getDataSourceAzSynapse(
@@ -71,29 +72,7 @@ class DataUtils(secretScope: String, spark: SparkSession) {
     DataSourceAzSynapse(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
   }
 
-  def getDataSourceBlobBySecret(
-      blobNameSecretKey: String,
-      container: String,
-      pathPrefix: Option[String] = None,
-      secretScope: String = secretScope,
-      secretKey: String,
-      mountNow: Boolean = true
-  ): DataSourceAzBlob = {
-
-    val blob =
-      dbutils.secrets.get(scope = secretScope, key = blobNameSecretKey)
-
-    new DataSourceAzBlob(
-      blob = blob,
-      container = container,
-      pathPrefix = pathPrefix,
-      secretScope = secretScope,
-      secretKey = secretKey,
-      mountNow = mountNow
-    )
-  }
-
-  def getDataSourceBlob(
+  def getDataSourceAzBlob(
       blob: String,
       container: String,
       pathPrefix: Option[String] = None,
@@ -110,6 +89,29 @@ class DataUtils(secretScope: String, spark: SparkSession) {
       mountNow = mountNow
     )
   }
+
+  def getDataSourceBlobBySecret(
+      blobNameSecretKey: String,
+      container: String,
+      pathPrefix: Option[String] = None,
+      secretScope: String = secretScope,
+      secretKey: String,
+      mountNow: Boolean = true
+  ): DataSourceAzBlob = {
+
+    val blob =
+      dbutils.secrets.get(scope = secretScope, key = blobNameSecretKey)
+
+    getDataSourceAzBlob(
+      blob = blob,
+      container = container,
+      pathPrefix = pathPrefix,
+      secretScope = secretScope,
+      secretKey = secretKey,
+      mountNow = mountNow
+    )
+  }
+
 }
 
 object DataUtils {
@@ -120,7 +122,6 @@ object DataUtils {
     val du = new DataUtils(secretScope, spark)
     return du
   }
-
 
   def getJdbcUrl(
       name: String,
@@ -184,4 +185,14 @@ object DataUtils {
     return msg
   }
 
+  def compareSchema(
+      schemaActual: StructType,
+      schemaExpected: StructType
+  ): Unit = {
+    assert(
+      schemaActual.fields.sortBy(_.name).deep == schemaExpected.fields
+        .sortBy(_.name)
+        .deep
+    )
+  }
 }
