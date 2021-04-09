@@ -1,11 +1,9 @@
 name := "spark-gadget"
 organization := "com.github.ddxgz"
 
-version := "0.1.1"
+version := "0.1.2"
 
 ThisBuild / scalaVersion := "2.12.12"
-
-// val scalaTest = "org.scalatest" %% "scalatest" % "3.0.5"
 
 lazy val etl = (project in file("."))
   .settings(
