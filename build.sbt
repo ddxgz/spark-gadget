@@ -1,13 +1,14 @@
-name := "spark-gadget"
-organization := "com.github.ddxgz"
-
-version := "0.1.2"
+// name := "spark-gadget"
+// organization := "com.github.ddxgz"
 
 ThisBuild / scalaVersion := "2.12.12"
 
-lazy val etl = (project in file("."))
+lazy val gadget = (project in file("."))
   .settings(
     // name := "",
+    name := "spark-gadget",
+    organization := "com.github.ddxgz",
+    version := "0.1.2",
     libraryDependencies ++= Seq(
       //   "org.apache.spark" %% "spark-core" % "3.0.1" % "provided",
       "org.apache.spark" %% "spark-sql" % "3.1.1" % "provided",
