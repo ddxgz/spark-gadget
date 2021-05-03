@@ -48,14 +48,28 @@ abstract class FileDataSource(
   override def toString(): String = s"[$sourceType] $rootPath"
 }
 
-/** DataSource to Azure Data Lake Storage Gen2
+/** DataSource to local path
   *
   * @param sourceType
-  * @param blob
-  * @param container
+  * @param rootPath
   * @param pathPrefix
-  * @param secretScope
-  * @param secretKey
+  */
+case class DataSourceLocal(
+    override val sourceType: String = "Local",
+    override val pathPrefix: Option[String] = None
+) extends FileDataSource(sourceType, pathPrefix)
+    with RootPather {
+
+  val rootPath = pathPrefix match {
+    case Some(prefix) => prefix
+    case None         => "./"
+  }
+}
+
+/** DataSource to Databricks DBFS
+  *
+  * @param sourceType
+  * @param pathPrefix
   */
 case class DataSourceDbfs(
     override val sourceType: String = "DBFS",

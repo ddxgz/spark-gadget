@@ -9,6 +9,13 @@ import com.databricks.dbutils_v1.DBUtilsHolder.dbutils
 class DataUtils(secretScope: String, spark: SparkSession) {
   // val dbutils = DataUtils.dbutils
 
+  def getDataSourceLocal(
+      pathPrefix: Option[String] = None
+  ): DataSourceLocal = {
+
+    DataSourceLocal(pathPrefix = pathPrefix)
+  }
+
   def getDataSourceDbfs(
       pathPrefix: Option[String] = None
   ): DataSourceDbfs = {

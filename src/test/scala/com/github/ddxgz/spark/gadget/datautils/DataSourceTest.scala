@@ -59,4 +59,12 @@ class DataSourceTest extends FunSpec {
     }
   }
 
+  describe("DataSource::DataSourceLocal") {
+    it("should give default file path as './'") {
+      val dsl = DataSourceLocal(pathPrefix = Some("./"))
+      val dsl2 = DataSourceLocal()
+
+      assert(dsl.rootPath == dsl2.rootPath)
+    }
+  }
 }

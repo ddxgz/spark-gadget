@@ -8,7 +8,7 @@ lazy val gadget = (project in file("."))
     // name := "",
     name := "spark-gadget",
     organization := "com.github.ddxgz",
-    version := "0.1.3",
+    version := "0.2.2",
     libraryDependencies ++= Seq(
       //   "org.apache.spark" %% "spark-core" % "3.0.1" % "provided",
       "org.apache.spark" %% "spark-sql" % "3.1.1" % "provided",
