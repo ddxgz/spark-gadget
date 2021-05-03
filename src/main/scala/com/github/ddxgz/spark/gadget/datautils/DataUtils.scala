@@ -56,10 +56,10 @@ class DataUtils(secretScope: String, spark: SparkSession) {
   def getDataSourceAzSynapse(
       jdbcUrlKey: String,
       tempDir: String
-  ): DataSourceDbfs = {
+  ): DataSourceAzSynapse = {
 
     val jdbcUrl = dbutils.secrets.get(scope = secretScope, key = jdbcUrlKey)
-    DataSourceDbfs(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
+    DataSourceAzSynapse(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
   }
 
   def getDataSourceAzSynapse(
@@ -69,7 +69,7 @@ class DataUtils(secretScope: String, spark: SparkSession) {
       userKey: String,
       passwordKey: String,
       tempDir: String
-  ): DataSourceDbfs = {
+  ): DataSourceAzSynapse = {
     val jdbcUrl =
       DataUtils.getJdbcUrl(
         name,
@@ -79,7 +79,7 @@ class DataUtils(secretScope: String, spark: SparkSession) {
         userKey,
         passwordKey
       )
-    DataSourceDbfs(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
+    DataSourceAzSynapse(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
   }
 
   def getDataSourceAzBlob(
