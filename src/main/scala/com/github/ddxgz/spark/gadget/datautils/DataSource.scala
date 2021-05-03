@@ -38,9 +38,38 @@ abstract class FileDataSource(
   def composePath(left: String, right: String): String =
     left.stripSuffix("/") + s"/${right.stripPrefix("/")}"
 
-  def file(path: String): String = composePath(rootPath(), path)
+  def path(to: String): String = composePath(rootPath(), to)
+
+  def file(path: String): String = this.path(to = path)
+
+  // def delta(path:String):DataFrame
+  // def parquet(path:String): DataFrame
 
   override def toString(): String = s"[$sourceType] $rootPath"
+}
+
+/** DataSource to Azure Data Lake Storage Gen2
+  *
+  * @param sourceType
+  * @param blob
+  * @param container
+  * @param pathPrefix
+  * @param secretScope
+  * @param secretKey
+  */
+case class DataSourceDbfs(
+    override val sourceType: String = "DBFS",
+    override val pathPrefix: Option[String] = None
+) extends FileDataSource(sourceType, pathPrefix)
+    with RootPather {
+
+  val dbfsRootPath = "dbfs:/FileStore"
+
+  val rootPath = pathPrefix match {
+    case Some(prefix) => composePath(dbfsRootPath, prefix)
+    case None         => s"$dbfsRootPath"
+  }
+
 }
 
 /** DataSource to Azure Blob Storage.

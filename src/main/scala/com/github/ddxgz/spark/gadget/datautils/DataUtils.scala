@@ -3,8 +3,11 @@ package com.github.ddxgz.spark.gadget.datautils
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types.StructType
 import com.databricks.dbutils_v1.DBUtilsHolder.dbutils
+// import com.databricks.dbutils_v1.DBUtilsV1
+// import com.databricks.service.DBUtils
 
 class DataUtils(secretScope: String, spark: SparkSession) {
+  // val dbutils = DataUtils.dbutils
 
   def getDataSourceAdls2(
       blob: String,
@@ -115,10 +118,17 @@ class DataUtils(secretScope: String, spark: SparkSession) {
 }
 
 object DataUtils {
+  // val dbutils = com.databricks.service.DBUtils
+
+  // var dbutils = com.databricks.dbutils_v1.DBUtilsHolder.dbutils
+
   def apply(
       secretScope: String,
       spark: SparkSession
+      // dbutilsin: DBUtilsV1
   ): DataUtils = {
+    // val dbutils = com.databricks.service.DBUtils
+    // dbutils = dbutilsin
     val du = new DataUtils(secretScope, spark)
     return du
   }
