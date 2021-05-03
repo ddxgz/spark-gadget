@@ -9,6 +9,13 @@ import com.databricks.dbutils_v1.DBUtilsHolder.dbutils
 class DataUtils(secretScope: String, spark: SparkSession) {
   // val dbutils = DataUtils.dbutils
 
+  def getDataSourceDbfs(
+      pathPrefix: Option[String] = None
+  ): DataSourceDbfs = {
+
+    DataSourceDbfs(pathPrefix = pathPrefix)
+  }
+
   def getDataSourceAdls2(
       blob: String,
       container: String,
@@ -49,10 +56,10 @@ class DataUtils(secretScope: String, spark: SparkSession) {
   def getDataSourceAzSynapse(
       jdbcUrlKey: String,
       tempDir: String
-  ): DataSourceAzSynapse = {
+  ): DataSourceDbfs = {
 
     val jdbcUrl = dbutils.secrets.get(scope = secretScope, key = jdbcUrlKey)
-    DataSourceAzSynapse(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
+    DataSourceDbfs(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
   }
 
   def getDataSourceAzSynapse(
@@ -62,7 +69,7 @@ class DataUtils(secretScope: String, spark: SparkSession) {
       userKey: String,
       passwordKey: String,
       tempDir: String
-  ): DataSourceAzSynapse = {
+  ): DataSourceDbfs = {
     val jdbcUrl =
       DataUtils.getJdbcUrl(
         name,
@@ -72,7 +79,7 @@ class DataUtils(secretScope: String, spark: SparkSession) {
         userKey,
         passwordKey
       )
-    DataSourceAzSynapse(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
+    DataSourceDbfs(jdbcUrl = jdbcUrl, tempDir = tempDir, spark = spark)
   }
 
   def getDataSourceAzBlob(
